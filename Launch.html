@@ -2,65 +2,65 @@
 <html>
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-        canvas {
-            border: 1px solid #d3d3d3;
-            background-color: #f1f1f1;
-        }
-    </style>
-    <title>Bird</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<style>
+		canvas {
+			border: 1px solid #d3d3d3;
+			background-color: #f1f1f1;
+		}
+	</style>
+	<title>Bird</title>
 </head>
 
 <body>
-    <button onclick="startGame()" id="start">Use mouse</button><button onclick="useArrows();" id="controls">Use
-        arrows</button>
-    <script src="js/index.js"></script>
-    <!-- <p id="speed"></p> -->
-    <!-- <button onclick="oBSSpeed -=.2;lengthOfGap -= 20;">Get faster</button> -->
-    <div style="float: right; border: 1px black;">
-        <p>
-            How to play:
-        </p>
-        <p>
-            If you click the use mouse button, the red square will follow your mouse. Try to go into the hole in the
-            green
-            sticks. If you click use arrows button, use the arrows to control the red square.
-        </p>
-    </div>
-    <p id="version">
-        Version: -.-
-    </p>
-    <p id="currentVersion">
-        Current Version: -.-
-        <!-- You need to be connected to the internet for this to work! -->
-    </p>
-    <p id="change">
-        Change Log:
-    </p>
-    <!-- <p>
+	<button onclick="startGame()" id="start">Use mouse</button><button onclick="useArrows();" id="controls">Use
+		arrows</button>
+	<script src="js/index.js"></script>
+	<!-- <p id="speed"></p> -->
+	<!-- <button onclick="oBSSpeed -=.2;lengthOfGap -= 20;">Get faster</button> -->
+	<div style="float: right; border: 1px black;">
+		<p>
+			How to play:
+		</p>
+		<p>
+			If you click the use mouse button, the red square will follow your mouse. Try to go into the hole in the
+			green sticks. If you click use arrows button, use the arrows to control the red square.
+		</p>
+	</div>
+	<p id="version">
+		Version: -.-
+	</p>
+	<!-- <p id="currentVersion">
+		Current Version: -.-
+		You need to be connected to the internet for this to work!
+	</p> -->
+	<p id="change">
+		Change Log:
+	</p>
+	<!-- <p>
 		<button onclick="/*location.reload();*/startGame()">Restart with mouse</button><button
             onclick="/*location.reload();*/useArrows();">Restart with arrows</button>
 	</p> -->
-    <script>
-        // this needs work:
-        document.getElementById('version').innerHTML = 'Version: ' + version;
-        document.getElementById('change').innerHTML = 'Change Log: ' + changeLogTop;
-        window.addEventListener("load", () => {
-            // API URL
-            const base = `http://games5412.42web.io/versions.json`;
+	<script>
+		// this needs work:
+		document.getElementById('version').innerHTML = 'Version: ' + version;
+		document.getElementById('change').innerHTML = 'Change Log: ' + changeLogTop;
+		/*
+		window.addEventListener("load", () => {
+			// API URL
+			const base = `http://games5412.42web.io/versions.json`;
 
-            // Calling the API
-            fetch(base)
-                .then((response) => {
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log(data);
-                    document.getElementById('currentVersion').innerHTML = data.Bird;
-                });
-        });
-    </script>
+			// Calling the API
+			fetch(base)
+				.then((response) => {
+					return response.json();
+				})
+				.then((data) => {
+					console.log(data);
+					document.getElementById('currentVersion').innerHTML = data.Bird;
+				});
+		}); */
+	</script>
 </body>
 
 </html>
