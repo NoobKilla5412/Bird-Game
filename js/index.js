@@ -16,27 +16,6 @@ for (const key in changes) {
 }
 // let version += " Beta";
 // let version += " Alpha";
-function setCookie(cname, cvalue, exdays) { // Try to set the cookie
-  const d = new Date();
-  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-  let expires = "expires=" + d.toUTCString();
-  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=";
-}
-function getCookie(cname) { // Try to get the cookie
-  let name = cname + "=";
-  let decodedCookie = decodeURIComponent(document.cookie);
-  let ca = decodedCookie.split(';');
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-}
 // Declaring the variables
 var myGamePiece;
 var myObstacles = [];
@@ -50,31 +29,42 @@ var oBSSpeed = -1.3;
 var controlMethod = 0;
 let highScore = getCookie("highScore");
 var BlockSpeed = 1.5; // Speed for arrow use only
-function startGame() { // Start the game using mouse
-  myGamePiece = new component(30, 30, "red", 50, 120); // Spwan the player
-  myScore = new component("30px", "Consolas", "black", 280, 40, "text"); // Score
-  winScore = new component("30px", "Consolas", "black", 450, 200, "text");
+/**
+ * Start the game using the mouse
+ */
+function startGame() {
+  myGamePiece = new Component(30, 30, "red", 50, 120); // Spawn the player
+  myScore = new Component("30px", "Consolas", "black", 280, 40, "text"); // Score
+  winScore = new Component("30px", "Consolas", "black", 450, 200, "text");
   myGameArea.start();
   document.getElementById('start').style.display = 'none';
   document.getElementById('controls').style.display = 'none';
 }
-function useArrows() { // Start the game using arrows
+/**
+ * Start the game using arrows
+ */
+function useArrows() {
   controlMethod = 1;
-  myGamePiece = new component(30, 30, "red", 50, 120); // Spwan the player
-  myScore = new component("30px", "Consolas", "black", 280, 40, "text"); // Score
-  winScore = new component("30px", "Consolas", "black", 450, 200, "text");
+  myGamePiece = new Component(30, 30, "red", 50, 120); // Spawn the player
+  myScore = new Component("30px", "Consolas", "black", 280, 40, "text"); // Score
+  winScore = new Component("30px", "Consolas", "black", 450, 200, "text");
   myGameArea.start();
   document.getElementById('start').style.display = 'none';
   document.getElementById('controls').style.display = 'none';
 }
-
+/**
+ * The game canvas
+ */
 var myGameArea = {
   canvas: document.createElement("canvas"),
   start: function () {
     this.canvas.width = 1000;
     this.canvas.height = 400;
+    /**
+     * hide the original cursor
+     */
     if (controlMethod === 0) {
-      this.canvas.style.cursor = "none"; //hide the original cursor
+      this.canvas.style.cursor = "none";
     }
     this.canvas.id = 'gameScreen';
     this.context = this.canvas.getContext("2d");
@@ -97,23 +87,37 @@ var myGameArea = {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
   stop: function () {
+    /**
+     * Show the original cursor
+     */
     if (controlMethod == 0) {
-      this.canvas.style.cursor = "default"; //Show the original cursor
+      this.canvas.style.cursor = "default";
     }
-    setCookie("highScore", ((myObstacles.length / 2) - 1), 0); // Try to set the highScore var
-    clearInterval(this.interval); // Stop the game
+    /**
+     * Try to set the highScore var
+     */
+    localStorage.setItem("highScore", ((myObstacles.length / 2) - 1));
+    /**
+     * Stop the game
+     */
+    clearInterval(this.interval);
   }
 }
 
-function component(width, height, color, x, y, type) {
-  this.type = type;
-  this.width = width;
-  this.height = height;
-  this.speedX = 0;
-  this.speedY = 0;
-  this.x = x;
-  this.y = y;
-  this.update = function () {
+class Component {
+  constructor(width, height, color, x, y, type) {
+    this.type = type;
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;
+    this.x = x;
+    this.y = y;
+  }
+  /**
+   * Update ``this``
+   */
+  update() {
     ctx = myGameArea.context;
     if (this.type == "text") {
       ctx.font = this.width + " " + this.height;
@@ -124,25 +128,39 @@ function component(width, height, color, x, y, type) {
       ctx.fillRect(this.x, this.y, this.width, this.height);
     }
   }
-  this.newPos = function () { // Make the game elements move
+  /**
+   * Make ``this`` move
+   */
+  newPos() {
     this.x += this.speedX;
     this.y += this.speedY;
     this.hitRight();
     this.hitLeft();
   }
-  this.hitRight = function () { // check if the player hits the right wall
+  /**
+   * Check if ``this`` hits the right wall
+   */
+  hitRight() {
     var rockright = myGameArea.canvas.width - this.width;
     if (this.x > rockright) {
       this.x = rockright;
     }
   }
-  this.hitLeft = function () { // check if the player hits the left wall
+  /**
+   * check if ``this`` hits the left wall
+   */
+  hitLeft() {
     var rockleft = 0;
     if (myGamePiece.x < rockleft) {
       this.x = 0;
     }
   }
-  this.crashWith = function (otherobj) { // check if the player hits an obstacle
+  /**
+   * check if ``this`` hits an obstacle
+   * @param {object} otherobj The object to check
+   * @returns true if hit; false if not
+   */
+  crashWith(otherobj) {
     var myleft = this.x;
     var myright = this.x + (this.width);
     var mytop = this.y;
@@ -158,24 +176,39 @@ function component(width, height, color, x, y, type) {
     return crash;
   }
 }
-
-function updateGameArea() { // a function to update the game area
+/**
+ * a function to update the game area
+ * @returns void
+ */
+function updateGameArea() {
   var x, height, gap, minHeight, maxHeight, minGap, maxGap;
-  for (i = 0; i < myObstacles.length; i += 1) { // check if you have ran into an obstacle
+  /**
+   * check if you have ran into an obstacle
+   */
+  for (i = 0; i < myObstacles.length; i += 1) {
     if (myGamePiece.crashWith(myObstacles[i])) {
       myGameArea.stop();
       return;
     }
   }
-  myGameArea.clear(); // clear the canvas
-  if (everyInterval(lengthOfGap * 10)) { // make it harder each level
+  /**
+   * clear the canvas
+   */
+  myGameArea.clear();
+  /**
+   * make it harder each level
+   */
+  if (everyInterval(lengthOfGap * 10)) {
     oBSSpeed -= .1;
     lengthOfGap -= 10;
   }
   if (lengthOfGap < 10) {
     lengthOfGap = 10
   }
-  if (/*myGameArea.frameNo == 1 || */everyInterval(lengthOfGap)) { // genarte the obstacles
+  /**
+   * generate the obstacles
+   */
+  if (/*myGameArea.frameNo == 1 || */everyInterval(lengthOfGap)) {
     x = myGameArea.canvas.width;
     minHeight = 100;
     maxHeight = 200;
@@ -183,10 +216,10 @@ function updateGameArea() { // a function to update the game area
     minGap = minLengthOfHole;
     maxGap = maxLengthOfHole;
     gap = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);
-    myObstacles.push(new component(15, height, "green", x, 0));
-    myObstacles.push(new component(15, x - height - gap, "green", x, height + gap));
-    //myObstacles.push(new component(10, 201, "green", x, 0));
-    //myObstacles.push(new component(10, x - height, "green", x, height));
+    myObstacles.push(new Component(15, height, "green", x, 0));
+    myObstacles.push(new Component(15, x - height - gap, "green", x, height + gap));
+    //myObstacles.push(new Component(10, 201, "green", x, 0));
+    //myObstacles.push(new Component(10, x - height, "green", x, height));
   }
 
   //myScore.text = "SCORE: " + Math.floor(myGameArea.frameNo/100);// + ", OBSTACLES: " + myObstacles.length / 2;
@@ -195,41 +228,53 @@ function updateGameArea() { // a function to update the game area
   myGamePiece.speedY = 0; // reset the player's Y speed
   if (controlMethod === 1 && !isPaused) { // if using arrows and not paused
     if (myGameArea.keys && myGameArea.keys[37]) { // Up arrow
-                /* Left */ myGamePiece.speedX = -BlockSpeed;
+      myGamePiece.speedX = -BlockSpeed; // Left
     }
     if (myGameArea.keys && myGameArea.keys[39]) { // Right arrow
-                /* Right */ myGamePiece.speedX = BlockSpeed;
+      myGamePiece.speedX = BlockSpeed; // Right
     }
     if (myGameArea.keys && myGameArea.keys[38]) { // Up arrow
-                /* Up */ myGamePiece.speedY = -BlockSpeed;
+      myGamePiece.speedY = -BlockSpeed; // Up
     }
     if (myGameArea.keys && myGameArea.keys[40]) { // Down arrow
-                /* Down */ myGamePiece.speedY = BlockSpeed;
+      myGamePiece.speedY = BlockSpeed; // Down
     }
     /*
     if (myGameArea.keys && myGameArea.keys[16]) { // Shift
         BlockSpeed = -1.5;
     }*/
     // BlockSpeed = 1.5;
-  } else if (controlMethod === 0 && !isPaused) { // if using mouse and not paused
+    /**
+     * if using mouse and not paused
+     */
+  } else if (controlMethod === 0 && !isPaused) {
     if (myGameArea.x && myGameArea.y) {
       myGamePiece.x = myGameArea.x;
       myGamePiece.y = myGameArea.y;
     }
   }
-  if (myGameArea.keys && myGameArea.keys[192]) { // check if ` is pressed
+  /**
+   * check if ` is pressed
+   */
+  if (myGameArea.keys && myGameArea.keys[192]) {
     if (!isPaused) {
       pauseGame = true; // pause the game
       isPaused = true;
     }
   }
-  if (myGameArea.keys && myGameArea.keys[49]) { // check if 1 is pressed
+  /**
+   * check if 1 is pressed
+   */
+  if (myGameArea.keys && myGameArea.keys[49]) {
     if (isPaused) {
       pauseGame = false; // unpause the game
       isPaused = false;
     }
   }
-  if (pauseGame) { // pause the game
+  /**
+   * pause the game
+   */
+  if (pauseGame) {
     for (i = 0; i < myObstacles.length; i += 1) {
       myObstacles[i].speedX = 0;
       myObstacles[i].newPos();
