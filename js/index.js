@@ -1,6 +1,19 @@
 let version = 1.5;
-let changes = { "v1_4": { "title": "v1.4: ", "content": "Make the obsticles thicker" }, "v1_5": { "title": "v1.5: ", "content": "Fix bugs" } };
-let changeLogTop = changes.v1_5.title + changes.v1_5.content + "<br>" + changes.v1_4.title + changes.v1_4.content;
+let changes = {
+  "1.4": {
+    "content": "Make the obsticles thicker"
+  },
+  "1.5": {
+    "content": "Fix bugs"
+  }
+};
+let changeLogTop = '<br>';
+for (const key in changes) {
+  if (Object.hasOwnProperty.call(changes, key)) {
+    const value = changes[key];
+    changeLogTop += `v${key}: ${value.content}<br>`;
+  }
+}
 // let version += " Beta";
 // let version += " Alpha";
 function setCookie(cname, cvalue, exdays) { // Try to set the cookie
