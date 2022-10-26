@@ -1,13 +1,13 @@
-let version = 1.5;
-let changes = {
+var version = 1.5;
+var changes = {
   "1.4": {
-    "content": "Make the obsticles thicker"
+    "content": "Make the obstacles thicker"
   },
   "1.5": {
     "content": "Fix bugs"
   }
 };
-let changeLogTop = '<br>';
+var changeLogTop = '<br>';
 for (const key in changes) {
   if (Object.hasOwnProperty.call(changes, key)) {
     const value = changes[key];
@@ -27,7 +27,7 @@ var maxLengthOfHole = 100;
 var minLengthOfHole = 200;
 var oBSSpeed = -1.3;
 var controlMethod = 0;
-let highScore = getCookie("highScore");
+var highScore = 0;
 var BlockSpeed = 1.5; // Speed for arrow use only
 /**
  * Start the game using the mouse
@@ -36,6 +36,11 @@ function startGame() {
   myGamePiece = new Component(30, 30, "red", 50, 120); // Spawn the player
   myScore = new Component("30px", "Consolas", "black", 280, 40, "text"); // Score
   winScore = new Component("30px", "Consolas", "black", 450, 200, "text");
+  if (!localStorage.getItem('highScoreMouse'))
+    localStorage.setItem('highScoreMouse', 0);
+  else {
+    highScore = parseInt(localStorage.getItem('highScoreMouse'));
+  }
   myGameArea.start();
   document.getElementById('start').style.display = 'none';
   document.getElementById('controls').style.display = 'none';
@@ -48,6 +53,11 @@ function useArrows() {
   myGamePiece = new Component(30, 30, "red", 50, 120); // Spawn the player
   myScore = new Component("30px", "Consolas", "black", 280, 40, "text"); // Score
   winScore = new Component("30px", "Consolas", "black", 450, 200, "text");
+  if (!localStorage.getItem('highScoreArrows'))
+    localStorage.setItem('highScoreArrows', 0);
+  else {
+    highScore = parseInt(localStorage.getItem('highScoreArrows'));
+  }
   myGameArea.start();
   document.getElementById('start').style.display = 'none';
   document.getElementById('controls').style.display = 'none';
@@ -96,7 +106,10 @@ var myGameArea = {
     /**
      * Try to set the highScore var
      */
-    localStorage.setItem("highScore", ((myObstacles.length / 2) - 1));
+    if (controlMethod === 0)
+      localStorage.setItem("highScoreMouse", ((myObstacles.length / 2) - 1));
+    else
+      localStorage.setItem("highScoreArrows", ((myObstacles.length / 2) - 1));
     /**
      * Stop the game
      */
@@ -113,18 +126,19 @@ class Component {
     this.speedY = 0;
     this.x = x;
     this.y = y;
+    this.color = color;
   }
   /**
    * Update ``this``
    */
   update() {
-    ctx = myGameArea.context;
+    let ctx = myGameArea.context;
     if (this.type == "text") {
       ctx.font = this.width + " " + this.height;
-      ctx.fillStyle = color;
+      ctx.fillStyle = this.color;
       ctx.fillText(this.text, this.x, this.y);
     } else {
-      ctx.fillStyle = color;
+      ctx.fillStyle = this.color;
       ctx.fillRect(this.x, this.y, this.width, this.height);
     }
   }
@@ -141,17 +155,15 @@ class Component {
    * Check if ``this`` hits the right wall
    */
   hitRight() {
-    var rockright = myGameArea.canvas.width - this.width;
-    if (this.x > rockright) {
-      this.x = rockright;
+    if (this.x > myGameArea.canvas.width - this.width) {
+      this.x = myGameArea.canvas.width - this.width;
     }
   }
   /**
    * check if ``this`` hits the left wall
    */
   hitLeft() {
-    var rockleft = 0;
-    if (myGamePiece.x < rockleft) {
+    if (myGamePiece.x < 0) {
       this.x = 0;
     }
   }
@@ -208,7 +220,7 @@ function updateGameArea() {
   /**
    * generate the obstacles
    */
-  if (/*myGameArea.frameNo == 1 || */everyInterval(lengthOfGap)) {
+  if (everyInterval(lengthOfGap)) {
     x = myGameArea.canvas.width;
     minHeight = 100;
     maxHeight = 200;
@@ -239,15 +251,10 @@ function updateGameArea() {
     if (myGameArea.keys && myGameArea.keys[40]) { // Down arrow
       myGamePiece.speedY = BlockSpeed; // Down
     }
-    /*
-    if (myGameArea.keys && myGameArea.keys[16]) { // Shift
-        BlockSpeed = -1.5;
-    }*/
-    // BlockSpeed = 1.5;
     /**
      * if using mouse and not paused
      */
-  } else if (controlMethod === 0 && !isPaused) {
+  } else if (!isPaused) {
     if (myGameArea.x && myGameArea.y) {
       myGamePiece.x = myGameArea.x;
       myGamePiece.y = myGameArea.y;
